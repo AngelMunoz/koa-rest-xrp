@@ -12,7 +12,7 @@ Fairly simple and full async/await.
 
 >I personally use pnpm (npm i -g pnpm)
 ```bash
-pnpm install
+pnpm install # or npm install
 ```
 
 - In VS Code Press <kbd>F5</kbd> 
