@@ -1,0 +1,29 @@
+{
+  "name": "kosta",
+  "version": "0.0.1",
+  "description": "Small Koa Skeleton",
+  "main": "app.js",
+  "scripts": {
+    "dev": "node --inspect app.js",
+    "start": "node app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^8.4.0",
+    "koa": "^2.6.2",
+    "koa-bodyparser": "^4.2.1",
+    "koa-helmet": "^4.0.0",
+    "koa-jwt": "^3.5.1",
+    "koa-router": "^7.4.0",
+    "moment": "^2.22.2",
+    "mongoose": "^5.3.15",
+    "winston": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/koa": "^2.0.47",
+    "@types/node": "^10.12.12"
+  }
+}
