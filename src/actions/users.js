@@ -1,10 +1,12 @@
 'use strict';
+
 const { logger } = require('../services/logger');
 const { User } = require('../models');
 
 async function find(ctx, next) {
   await next();
-  const [list, count] = await Promise.all([User.find(), User.count()]);
+  const [list, count] = await Promise.all([User.find(), User.countDocuments()]);
+  ctx.status = 200;
   ctx.body = { list, count };
 }
 

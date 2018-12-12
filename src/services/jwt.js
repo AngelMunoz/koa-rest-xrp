@@ -33,8 +33,8 @@ class JwtService {
 
   /**
    * issues a json web token
-   * @param {object} payload payload to be tokenized
-   * @param {number?} userId id of the user which will be on the token
+   * @param {{ [x: string]: any }} payload Any Key/Value that you want to add to the token in question
+   * @param {{ [x: string]: any }} options SignOptions from the jsonwebtoken lib
    */
   async issueToken(payload = {}, options = { expiresIn: '1 day' }) {
     const token = await jwt.sign(payload, this.token, options);
@@ -45,13 +45,13 @@ class JwtService {
   /**
    *
    * @param {string} token token to be verified
-   * @param {VerifyOptions?} options options
+   * @param {{ [x: string]: any }} options VeryfyOptions from the jsonwebtoken lib
    * @return {boolean}
    */
   verify(token = this.token, options = {}) {
     let valid = false;
     try {
-      valid = jwt.verify(token, this.token, options);
+      valid = !!jwt.verify(token, this.token, options);
     } catch (error) {
       throw new Error(error.message);
     }
