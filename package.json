@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@types/koa": "^2.0.47",
-    "@types/node": "^10.12.12"
+    "@types/node": "^10.12.12",
+    "eslint": "^5.0.0"
   }
 }
