@@ -8,9 +8,15 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Program",
-      "program": "${workspaceFolder}/app.js",
+      "program": "${workspaceFolder}/bin/app.js",
+      "preLaunchTask": "build",
       "outputCapture": "std",
-      "console": "internalConsole"
+      "console": "internalConsole",
+      "sourceMaps": true,
+      "showAsyncStacks": true,
+      "env": {
+        "NODE_ENV": "development"
+      }
     }
   ]
 }

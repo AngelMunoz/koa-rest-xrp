@@ -1,22 +1,28 @@
-'use strict';
+import { BaseContext } from 'koa';
+import { hash, compare } from 'bcryptjs';
+import { JwtService } from '../services/jwt';
+import { logger } from '../services/logger';
+import { User, IUserSchema } from '../models/users';
+import { KoaNext } from '../interfaces/annotations';
 
-const { JwtService } = require('../services/jwt');
-const { hash, compare } = require('bcryptjs');
-const { logger } = require('../services/logger');
-const { User } = require('../models');
-
-async function login(ctx, next) {
+export async function login(ctx: BaseContext, next: KoaNext) {
   await next();
   if (!ctx.request.body || !ctx.request.body.email || !ctx.request.body.password) {
     ctx.response.status = 400;
     ctx.body = { error: 'Missing Fields' };
     return;
   }
-  const payload = Object.assign({}, ctx.request.body);
+  const payload: IUserSchema = { ...ctx.request.body };
   const creds = await User.findOne({ email: payload.email })
     .select('email')
     .select('password')
     .exec();
+
+  if (!creds) {
+    ctx.response.status = 404;
+    ctx.body = { error: 'User Not Found' };
+    return;
+  }
 
   const valid = await compare(payload.password, creds.password);
 
@@ -31,7 +37,7 @@ async function login(ctx, next) {
   ctx.body = { token, user: creds.id };
 }
 
-async function signup(ctx, next) {
+export async function signup(ctx: BaseContext, next: KoaNext) {
   await next();
   if (!ctx.request.body) {
     ctx.response.status = 400;
@@ -55,8 +61,3 @@ async function signup(ctx, next) {
   }
   ctx.response.status = 202;
 }
-
-module.exports = {
-  login,
-  signup
-};

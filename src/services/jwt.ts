@@ -1,14 +1,12 @@
-'use strict';
-
-const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = require('../config');
+import { decode, sign, verify } from 'jsonwebtoken';
+import { JWT_SECRET } from '../config';
 
 /**
  * JsonWebToken Service to issue, decode and verify tokens
  * @class
  */
-class JwtService {
-
+export class JwtService {
+  token: string;
   /**
    * works on top of the token if provided
    * @param {object?} token  Json Web Token provided to work with it
@@ -22,13 +20,12 @@ class JwtService {
    * @param {string} token jwt to be decoded
    */
   decodeJwt(token = this.token) {
-    let payload = {};
     try {
-      payload = jwt.decode(token);
+      let payload = decode(token);
+      if (payload) { return payload; }
     } catch (error) {
       throw new Error(error.message);
     }
-    return payload;
   }
 
   /**
@@ -37,7 +34,7 @@ class JwtService {
    * @param {{ [x: string]: any }} options SignOptions from the jsonwebtoken lib
    */
   async issueToken(payload = {}, options = { expiresIn: '1 day' }) {
-    const token = await jwt.sign(payload, this.token, options);
+    const token = await sign(payload, this.token, options);
     // All done.
     return token;
   }
@@ -51,7 +48,7 @@ class JwtService {
   verify(token = this.token, options = {}) {
     let valid = false;
     try {
-      valid = !!jwt.verify(token, this.token, options);
+      valid = !!verify(token, this.token, options);
     } catch (error) {
       throw new Error(error.message);
     }
@@ -59,7 +56,3 @@ class JwtService {
     return valid;
   }
 }
-
-module.exports = {
-  JwtService
-};

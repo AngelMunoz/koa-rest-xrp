@@ -18,3 +18,4 @@ lib-cov
 *.pid
 *.env.*
 docker-compose.override.yml
+bin
