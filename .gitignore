@@ -19,3 +19,4 @@ lib-cov
 *.env.*
 docker-compose.override.yml
 bin
+dist

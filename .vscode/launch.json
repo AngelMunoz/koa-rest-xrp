@@ -6,17 +6,12 @@
   "configurations": [
     {
       "type": "node",
-      "request": "launch",
-      "name": "Launch Program",
-      "program": "${workspaceFolder}/bin/app.js",
-      "preLaunchTask": "build",
-      "outputCapture": "std",
-      "console": "internalConsole",
-      "sourceMaps": true,
+      "request": "attach",
+      "name": "Attach",
+      "port": 9229,
       "showAsyncStacks": true,
-      "env": {
-        "NODE_ENV": "development"
-      }
+      "smartStep": true,
+      "restart": true
     }
   ]
 }

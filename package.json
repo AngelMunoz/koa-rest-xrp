@@ -2,11 +2,10 @@
   "name": "kosta",
   "version": "0.0.1",
   "description": "Small Koa Skeleton",
-  "main": "app.js",
+  "main": "fuse.js",
   "scripts": {
-    "prestart": "tsc -p .",
-    "dev": "tsc -p . && node --inspect bin/app.js",
-    "start": "node bin/app.js"
+    "prestart": "rimraf ./dist",
+    "start": "node ./fuse.js"
   },
   "keywords": [],
   "author": "",
@@ -33,6 +32,10 @@
     "@types/mongoose": "^5.5.6",
     "@types/node": "12.0.8",
     "eslint": "5.16.0",
-    "typescript": "3.5.2"
+    "fuse-box": "next",
+    "source-map-support": "^0.5.16",
+    "tslib": "1.10.0",
+    "typescript": "3.6.4",
+    "rimraf": "3.0.0"
   }
 }
