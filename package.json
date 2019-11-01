@@ -19,7 +19,7 @@
     "koa-jwt": "3.5.1",
     "koa-router": "7.4.0",
     "moment": "2.24.0",
-    "mongoose": "5.6.0",
+    "mongoose": "5.7.7",
     "winston": "3.2.1"
   },
   "devDependencies": {
