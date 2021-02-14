@@ -6,20 +6,16 @@ function dev() {
   const fuse = fusebox({
     target: 'server',
     tsConfig: './tsconfig.json',
-    watch: true,
+    watcher: true,
     cache: true,
     hmr: true,
     entry: 'src/app.ts',
-    logging: {
-      level: "verbose"
-    },
+    sourceMap: true,
+    dependencies: { serverIgnoreExternals: true },
+    logging: { level: 'succinct' }
   });
 
-  return fuse.runDev(handler => {
-    handler.onComplete(output => {
-      output.server.handleEntry({ nodeArgs: ['--inspect'], scriptArgs: [] });
-    });
-  });
+  return fuse.runDev().then(({ onComplete }) => onComplete(({ server }) => server.start({ argsBefore: ["--inspect"] })));
 }
 
 function prod() {
@@ -31,13 +27,8 @@ function prod() {
 
   return fuse.runProd({
     uglify: true,
-    target: "ESNext",
-    handler: handler => {
-      handler.onComplete(output => {
-        output.server.handleEntry({ nodeArgs: [], scriptArgs: [] });
-      });
-    },
-  });
+    target: 'server'
+  }).then(({ onComplete }) => onComplete(({ server }) => server.start({})));
 }
 
 let app;

@@ -20,3 +20,4 @@ lib-cov
 docker-compose.override.yml
 bin
 dist
+.cache
