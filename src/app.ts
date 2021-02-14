@@ -9,6 +9,7 @@ import { router } from "./routes";
 import { JWT_SECRET, HOST, PORT } from "./config";
 import { connectToDB } from "./services/database";
 import { defaultLogger, logger } from "./services/logger";
+import { decodeToken } from "./services/jwt";
 
 const app = new Koa();
 app
@@ -19,12 +20,13 @@ app
       path: [/^\/auth/, /^\/public/, /^\/favicon/, /^\//, /^\/check/]
     })
   )
+  .use(decodeToken)
+  .use(defaultLogger)
   .use(router.routes())
   .use(router.allowedMethods())
-  .use(defaultLogger)
   .on("error", (err, ctx) => {
     if (ctx) {
-      logger.error(`[${err}] - ${ctx.href}`);
+      logger.error(`[${err}] ${ctx.status} - ${ctx.href}`);
     } else {
       logger.error(`[${err}]`);
     }

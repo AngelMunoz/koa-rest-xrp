@@ -36,7 +36,7 @@ export async function login(ctx: Context, next: Next) {
   }
 
   const jwts = new JwtService();
-  const token = await jwts.issueToken({
+  const token = jwts.issueToken({
     user: { id: creds.id, email: creds.email }
   });
   ctx.body = { token, user: creds.id };
@@ -44,7 +44,7 @@ export async function login(ctx: Context, next: Next) {
 
 export async function signup(ctx: Context, next: Next) {
   await next();
-  if (!ctx.request.body) {
+  if (!ctx.request?.body || Object.keys(ctx.request?.body).length <= 0) {
     ctx.response.status = 400;
     ctx.body = { error: "Missing Request Body" };
     return;

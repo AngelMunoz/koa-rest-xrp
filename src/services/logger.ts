@@ -10,6 +10,8 @@ export async function defaultLogger(ctx: Context, next: Next) {
   await next();
   logger.log({
     level: "info",
-    message: `[${new Date().toJSON()}] ${ctx.method} - ${ctx.path}`
+    message: `[${new Date().toJSON()}] ${ctx.method} ${ctx.status} - ${
+      ctx.path
+    }`
   });
 }

@@ -1,4 +1,5 @@
 import { decode, sign, verify, SignOptions } from "jsonwebtoken";
+import { Context, Next } from "koa";
 import { JWT_SECRET } from "../config";
 
 /**
@@ -56,4 +57,19 @@ export class JwtService {
     // All done.
     return valid;
   }
+}
+
+export async function decodeToken(ctx: Context, next: Next) {
+  const headerValue = ctx.headers?.authorization;
+  if (!headerValue) return await next();
+
+  const [, token] = headerValue.split(" ");
+  if (!token) return await next();
+  try {
+    const payload = verify(token, JWT_SECRET) as any;
+    ctx.state.jwtValue = { ...payload };
+  } catch (error) {
+    console.warn(error);
+  }
+  return await next();
 }
