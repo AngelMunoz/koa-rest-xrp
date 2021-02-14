@@ -15,7 +15,18 @@ function dev() {
     logging: { level: 'succinct' }
   });
 
-  return fuse.runDev().then(({ onComplete }) => onComplete(({ server }) => server.start({ argsBefore: ["--inspect"] })));
+  return fuse.runDev().then(({ onComplete, onWatch }) => {
+    return onComplete(({ server }) => {
+      if (onWatch) {
+        onWatch(() => {
+          server.stop();
+          server.start({ argsBefore: ["--inspect"] })
+        })
+      } else {
+        server.start({ argsBefore: ["--inspect"] })
+      }
+    })
+  });
 }
 
 function prod() {
