@@ -1,32 +1,20 @@
-import { BaseContext, Context, Next } from "koa";
+import { Context, Next } from "koa";
 import { logger } from "../services/logger";
-import { Wallet } from "../models/wallets";
-import {
-  generateRandomWallet,
-  generateWalletFromMnemonic,
-  generateWalletFromSeed,
-  getBalance
-} from "../services/xrp";
+import Wallet, * as Wallets from "../models/wallets";
 
 export async function balance(ctx: Context, next: Next) {
   await next();
   const jwt = ctx.state.jwtValue;
   const owner = jwt?.user?.id;
-  const wallets = await Wallet.find({ owner });
-  if (!wallets || wallets.length <= 0) {
+  const wallets = await Wallet.count({ owner });
+  if (wallets <= 0) {
     ctx.status = 204;
-    ctx.body = { message: "No wallets found for user" };
+    ctx.body = { message: "No wallets found" };
     return;
   }
   const { name } = ctx.request.query;
-  const value = typeof name === "string" ? name.toLowerCase() : "default";
-  const walletRecord = wallets.find(
-    wallet => wallet.name.toLowerCase() === value
-  );
-  const wallet = walletRecord.seed
-    ? generateWalletFromSeed(walletRecord.seed)
-    : generateWalletFromMnemonic(walletRecord.mnemonic);
-  const balance = await getBalance(wallet);
+  const walletName = typeof name === "string" ? name.toLowerCase() : "default";
+  const balance = await Wallets.walletWithBalance(owner, walletName);
   ctx.status = 200;
   ctx.body = { balance };
 }
@@ -40,45 +28,13 @@ export async function createWallet(ctx: Context, next: Next) {
     return;
   }
   const { seed, name, mnemonic } = ctx.request.body;
-  if (seed) {
-    const wallet = generateWalletFromSeed(seed);
-    const walletRecord = new Wallet({
-      seed,
-      name: name ? name : "default",
-      owner,
-      address: wallet.getAddress()
-    });
-    await walletRecord.save();
-    ctx.status = 201;
-    ctx.body = { address: wallet.getAddress(), owner };
-    return;
-  }
-  if (mnemonic) {
-    const wallet = generateWalletFromMnemonic(mnemonic);
-    const walletRecord = new Wallet({
-      seed,
-      name: name ? name : "default",
-      owner,
-      address: wallet.getAddress()
-    });
-    await walletRecord.save();
-    ctx.status = 201;
-    ctx.body = { address: wallet.getAddress(), owner };
-    return;
-  }
-  const result = generateRandomWallet();
-  const walletRecord = new Wallet({
-    mnemonic: result.mnemonic,
-    name: name ? name : "default",
-    owner,
-    address: result.wallet.getAddress()
-  });
-  await walletRecord.save();
+  const wallet = await Wallets.createWallet({ owner, seed, name, mnemonic });
   ctx.status = 201;
   ctx.body = {
-    address: result.wallet.getAddress(),
     owner,
-    mnemonic: result.mnemonic
+    address: wallet.address,
+    mnemonic: wallet.mnemonic,
+    seed: wallet.seed
   };
 }
 
@@ -86,14 +42,31 @@ export async function wallets(ctx: Context, next: Next) {
   await next();
   const jwt = ctx.state.jwtValue;
   const owner = jwt?.user?.id;
-  const wallets = await Wallet.find({ owner });
+  const wallets = await Wallets.listWallets(owner);
   ctx.body = {
-    wallets: wallets.map(wallet => ({
-      name: wallet.name,
-      _id: wallet._id,
-      address: wallet.address
-    }))
+    wallets
   };
+}
+
+export async function recoverWallet(ctx: Context, next: Next) {
+  await next();
+  const jwt = ctx.state.jwtValue;
+  const owner = jwt?.user?.id;
+  const { seed, mnemonic, name } = ctx.request.body;
+  if (!name) {
+    ctx.status = 400;
+    ctx.body = "A name must be provided for this wallet";
+    return;
+  }
+  if (!mnemonic && !seed) {
+    ctx.status = 400;
+    ctx.body = "Either a seed or mnemonic must be provided";
+    return;
+  }
+  const wallet = await Wallets.createWallet({ owner, seed, mnemonic, name });
+  ctx.status = 201;
+  ctx.body = { address: wallet.address, owner };
+  return;
 }
 
 export async function del(ctx: Context, next: Next) {
