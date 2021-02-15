@@ -22,8 +22,7 @@
     "moment": "~2.29.1",
     "mongoose": "~5.11.16",
     "winston": "~3.3.3",
-    "xpring-js": "^5.3.1",
-    "xpring-common-js": "^6.2.9"
+    "xpring-js": "^5.3.1"
   },
   "devDependencies": {
     "@types/bcryptjs": "~2.4.2",
