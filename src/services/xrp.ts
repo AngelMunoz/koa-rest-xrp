@@ -35,7 +35,7 @@ export function generateRandomWallet() {
   return Wallet.generateRandomWallet();
 }
 
-export async function getBalance(wallet: Wallet) {
+export async function getWalletBalance(wallet: Wallet) {
   const client = clientFactory();
   const balance = await client.getBalance(wallet.getAddress());
   return XrpUtils.dropsToXrp(balance as any);
