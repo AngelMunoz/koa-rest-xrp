@@ -1,0 +1,17 @@
+{
+  "folders": [
+    {
+      "path": ".",
+      "name": "Root"
+    },
+    {
+      "path": "packages\\backend",
+      "name": "Web API"
+    },
+    {
+      "path": "packages\\frontend",
+      "name": "Website"
+    }
+  ],
+  "settings": {}
+}
