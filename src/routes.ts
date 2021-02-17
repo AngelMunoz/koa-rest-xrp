@@ -17,5 +17,6 @@ router
   .post("/auth/signup", Auth.signup)
   // xrp
   .get("/api/xrp/balance", Xrp.balance)
-  .post("/api/xrp/wallets", Xrp.createWallet)
-  .get("/api/xrp/wallets", Xrp.wallets);
+  .get("/api/xrp/wallets", Xrp.wallets)
+  .get(["/api/xrp/payments", "/api/xrp/payments/:name"], Xrp.payments)
+  .post("/api/xrp/wallets", Xrp.createWallet);

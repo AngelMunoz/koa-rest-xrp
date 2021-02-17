@@ -24,15 +24,15 @@ export function xpringClientFactory() {
 // the WalletFactory stuff didn't work
 
 export function generateWalletFromSeed(seed: string) {
-  return Wallet.generateWalletFromSeed(seed);
+  return Wallet.generateWalletFromSeed(seed, !IS_PROD);
 }
 
 export function generateWalletFromMnemonic(mnemonic: string) {
-  return Wallet.generateWalletFromMnemonic(mnemonic);
+  return Wallet.generateWalletFromMnemonic(mnemonic, undefined, !IS_PROD);
 }
 
 export function generateRandomWallet() {
-  return Wallet.generateRandomWallet();
+  return Wallet.generateRandomWallet(undefined, !IS_PROD);
 }
 
 export async function getWalletBalance(wallet: Wallet) {

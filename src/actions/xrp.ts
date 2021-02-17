@@ -69,7 +69,15 @@ export async function recoverWallet(ctx: Context, next: Next) {
   return;
 }
 
-export async function del(ctx: Context, next: Next) {
+export async function payments(ctx: Context, next: Next) {
   await next();
-  logger.info(`${ctx.path}`);
+  const jwt = ctx.state.jwtValue;
+  const owner = jwt?.user?.id;
+  const { name } = ctx.params;
+  try {
+    ctx.body = { payments: await Wallets.listPayments(owner, name) };
+  } catch (error) {
+    ctx.status = 503;
+    ctx.body = { payments: [], error: error.message };
+  }
 }

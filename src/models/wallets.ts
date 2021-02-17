@@ -5,7 +5,8 @@ import {
   generateWalletFromSeed,
   generateWalletFromMnemonic,
   getWalletBalance,
-  generateRandomWallet
+  generateRandomWallet,
+  getPaymentHistory
 } from "../services/xrp";
 
 type IWallet = {
@@ -48,23 +49,44 @@ Wallet.createIndexes(err => {
   logger.warn(`Failed to create the wallet indexes - ${err.message}`);
 });
 
+function getWalletFromSeedOrMnemonic({
+  seed,
+  mnemonic
+}: {
+  seed?: string;
+  mnemonic?: string;
+}): import("xpring-js").Wallet {
+  if (!seed && !mnemonic) throw new Error("Missing seed or mnemonic");
+  if (seed) {
+    return generateWalletFromSeed(seed);
+  }
+  if (mnemonic) {
+    return generateWalletFromMnemonic(mnemonic);
+  }
+}
+
 export async function walletWithBalance(
   owner: string,
   name: string
 ): Promise<(Partial<WalletModel> & { balance: string }) | undefined> {
   const walletRecord = await Wallet.findOne({ owner, name });
   if (!walletRecord) return;
-  const wallet = walletRecord.seed
-    ? generateWalletFromSeed(walletRecord.seed)
-    : generateWalletFromMnemonic(walletRecord.mnemonic);
-  const balance = await getWalletBalance(wallet);
-  return {
-    owner,
-    balance,
-    name: walletRecord.name,
-    address: walletRecord.address,
-    tag: walletRecord.tag
-  };
+  try {
+    const wallet = getWalletFromSeedOrMnemonic({
+      seed: walletRecord.seed,
+      mnemonic: walletRecord.mnemonic
+    });
+    const balance = await getWalletBalance(wallet);
+    return {
+      owner,
+      balance,
+      name: walletRecord.name,
+      address: walletRecord.address,
+      tag: walletRecord.tag
+    };
+  } catch (error) {
+    logger.debug(`Failed to get wallet from record [${walletRecord._id}]`);
+  }
 }
 export type CreationPayload = {
   owner: string;
@@ -110,6 +132,21 @@ export function listWallets(owner: string): Promise<Partial<WalletModel>[]> {
       tag: wallet.tag
     }))
   );
+}
+
+export async function listPayments(owner: string, name = "default") {
+  const walletRecord = await Wallet.findOne({ owner, name });
+  if (!walletRecord)
+    throw new Error(
+      `Couldn't find a wallet with name - owner: [${name} - ${owner}]`
+    );
+  const wallet = getWalletFromSeedOrMnemonic({
+    seed: walletRecord.seed,
+    mnemonic: walletRecord.mnemonic
+  });
+  if (!wallet) throw new Error("Failed to create wallet from seed or mnemonic");
+
+  return getPaymentHistory(wallet);
 }
 
 export default Wallet;
